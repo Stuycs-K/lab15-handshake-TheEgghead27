@@ -1,4 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include "pipe_networking.h"
+
+void fatal(const char * msg) {
+	perror(msg);
+	exit(errno);
+}
+
+const char WKP = "server.fifo";
+
 //UPSTREAM = to the server / from the client
 //DOWNSTREAM = to the client / from the server
 /*=========================
@@ -10,7 +22,12 @@
 	returns the file descriptor for the upstream pipe.
 	=========================*/
 int server_setup() {
-	int from_client = 0;
+	if (mkfifo(WKP))
+		fatal(WKP);
+	int from_client = open(WKP, O_RDONLY);
+	if (from_client < 0)
+		fatal(WKP);
+	remove(WKP);
 	return from_client;
 }
 
@@ -24,7 +41,13 @@ int server_setup() {
 	returns the file descriptor for the upstream pipe (see server setup).
 	=========================*/
 int server_handshake(int *to_client) {
-	int from_client;
+	int from_client = server_setup();
+	// TODO: makedynamic
+	read(from_client, to_client, sizeof(int));
+	char fname[16];  // 10 for int max, + 5 for .fifo + 1
+	sprintf(fname, "%du.fifo", *to_client);
+	open(fname, O_WRONLY);
+	remove(fname);
 	return from_client;
 }
 

@@ -11,6 +11,10 @@ void fatal(const char * msg) {
 	perror(msg);
 	exit(errno);
 }
+void clean_fatal(const char * msg, const char * fname) {
+	remove(fname);
+	fatal(msg);
+}
 
 //UPSTREAM = to the server / from the client
 //DOWNSTREAM = to the client / from the server
@@ -118,17 +122,19 @@ int client_handshake(int *to_server) {
 #endif
 	*to_server = open(WKP, O_WRONLY);
 	if (*to_server < 0)
-		fatal(WKP);
+		clean_fatal(WKP, fname);
 #ifdef DEBUG
 	printf("Client creating fifo PID %s\n", fname);
 #endif
-	write(*to_server, &pid, sizeof(int));
+	if (write(*to_server, &pid, sizeof(int)) < 0)
+		clean_fatal(WKP, fname);
+
 #ifdef DEBUG
 	printf("Client opening %s for SYN_ACK\n", fname);
 #endif
 	from_server = open(fname, O_RDONLY);
 	if (from_server < 0)
-		fatal(fname);
+		clean_fatal(fname, fname);
 
 #ifdef DEBUG
 	printf("Client deleting `%s`\n", fname);

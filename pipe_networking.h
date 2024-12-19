@@ -9,7 +9,7 @@
 
 #ifndef NETWORKING_H
 #define NETWORKING_H
-#define WKP "mario"
+#define WKP "server.fifo"
 
 #define HANDSHAKE_BUFFER_SIZE 10
 #define BUFFER_SIZE 1000
@@ -25,14 +25,17 @@
 int server_handshake(int *to_client);
 int client_handshake(int *to_server);
 
+/*
 //for basic & persistent servers
 int server_connect(int from_client);
+*/
 
 //for forking server
 int server_setup();
 
+/*
 //multi_server
 int multi_server_setup();
 int multi_server_connect(int from_client, struct message m);
-
+*/
 #endif

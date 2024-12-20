@@ -25,6 +25,9 @@
 int server_handshake(int *to_client);
 int client_handshake(int *to_server);
 
+int safe_read(int fd, void *buf, size_t count, const char *name);
+int safe_write(int fd, void *buf, size_t count, const char *name);
+
 /*
 //for basic & persistent servers
 int server_connect(int from_client);

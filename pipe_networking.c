@@ -16,6 +16,19 @@ void clean_fatal(const char * msg, const char * fname) {
 	fatal(msg);
 }
 
+int safe_read(int fd, void *buf, size_t count, const char *name) {
+	int ret;
+	if ((ret = read(fd, buf, count)) < 0)
+		fatal(name);
+	return ret;
+}
+int safe_write(int fd, void *buf, size_t count, const char *name) {
+	int ret;
+	if ((ret = write(fd, buf, count)) < 0)
+		fatal(name);
+	return ret;
+}
+
 //UPSTREAM = to the server / from the client
 //DOWNSTREAM = to the client / from the server
 /*=========================
@@ -61,8 +74,7 @@ int server_handshake(int *to_client) {
 #ifdef DEBUG
 	printf("Server reading SYN PID\n");
 #endif
-	if (read(from_client, to_client, sizeof(int)) < 1)
-		fatal(WKP);
+	safe_read(from_client, to_client, sizeof(int), WKP);
 	char fname[16];  // 10 for int max, + 5 for .fifo + 1
 	sprintf(fname, "%d.fifo", *to_client);
 #ifdef DEBUG
@@ -77,14 +89,12 @@ int server_handshake(int *to_client) {
 #ifdef DEBUG
 	printf("Server sending SYN_ACK value %d\n", buf[0]);
 #endif
-	if (write(*to_client, buf, sizeof(buf)) < 0)
-		fatal(fname);
+	safe_write(*to_client, buf, sizeof(int), fname);
 
 #ifdef DEBUG
 	printf("Server awaiting ACK\n");
 #endif
-	if (read(from_client, buf+1, sizeof(int)) < 1)
-		fatal(WKP);
+	safe_read(from_client, buf+1, sizeof(int), WKP);
 	if (buf[0]+1 != buf[1]) {
 		errno = EKEYREJECTED;
 		fatal("ACK FAIL!!!");
@@ -145,15 +155,13 @@ int client_handshake(int *to_server) {
 #ifdef DEBUG
 	printf("Client reading SYN_ACK value\n");
 #endif
-	if (read(from_server, &buf, sizeof(int)) < 0)
-		fatal(fname);
+	safe_read(from_server, &buf, sizeof(int), fname);
 	buf++;
 
 #ifdef DEBUG
 	printf("Client sending ACK value %d\n", buf);
 #endif
-	if (write(*to_server, &buf, sizeof(int)) < 0)
-		fatal(WKP);
+	safe_write(*to_server, &buf, sizeof(int), WKP);
 	return from_server;
 }
 

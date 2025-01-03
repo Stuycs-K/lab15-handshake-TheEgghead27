@@ -7,10 +7,11 @@ int main() {
 	from_client = server_handshake( &to_client );
 
 	int buf;
-	printf("Server reading magic value...\n");
-	safe_read(from_client, &buf, sizeof(int), "upstream");
-	buf--;
-	printf("Server sending decremented magic value %d %x\n", buf, buf);
-	safe_write(to_client, &buf, sizeof(int), "downstream");
-	printf("Server sent\n");
+	while (1) {
+		// RNG seeded by handshake
+		buf = rand() % 101;
+		printf("Sending %d to client(s)\n", buf);
+		safe_write(to_client, &buf, sizeof(int), "downstream");
+		sleep(1);
+	}
 }

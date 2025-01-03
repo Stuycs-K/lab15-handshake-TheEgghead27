@@ -18,13 +18,13 @@ void clean_fatal(const char * msg, const char * fname) {
 
 int safe_read(int fd, void *buf, size_t count, const char *name) {
 	int ret;
-	if ((ret = read(fd, buf, count)) < 0)
+	if ((ret = read(fd, buf, count)) <= 0)
 		fatal(name);
 	return ret;
 }
 int safe_write(int fd, void *buf, size_t count, const char *name) {
 	int ret;
-	if ((ret = write(fd, buf, count)) < 0)
+	if ((ret = write(fd, buf, count)) <= 0)
 		fatal(name);
 	return ret;
 }

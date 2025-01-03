@@ -8,7 +8,8 @@
 #define DEBUG
 
 void fatal(const char * msg) {
-	perror(msg);
+	if (errno)
+		perror(msg);
 	exit(errno);
 }
 void clean_fatal(const char * msg, const char * fname) {

@@ -71,7 +71,9 @@ int server_setup() {
 	=========================*/
 int server_handshake(int *to_client) {
 	int from_client = server_setup();
-	// TODO: makedynamic
+	return server_handshake_half(from_client, to_client);
+}
+int server_handshake_half(int from_client, int *to_client) {
 #ifdef DEBUG
 	printf("Server reading SYN PID\n");
 #endif

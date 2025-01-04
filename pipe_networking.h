@@ -23,6 +23,7 @@
 
 
 int server_handshake(int *to_client);
+int server_handshake_half(int from_client, int *to_client);
 int client_handshake(int *to_server);
 
 int safe_read(int fd, void *buf, size_t count, const char *name);

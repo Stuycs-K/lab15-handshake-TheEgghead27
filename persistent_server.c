@@ -9,11 +9,13 @@ static void handler(int sig) {
 		case SIGPIPE:
 			printf("Client disconnected\n");
 			break;
-		case SIGQUIT:
+		case SIGINT:
+			printf("Interrupted, cleaning up...\n");
 			remove(WKP);
 			close(to_client);
 			close(from_client);
-			break;
+			printf("Exiting...\n");
+			exit(0);
 		default:
 			printf("Unknown signal %d\n", sig);
 	}
@@ -22,7 +24,7 @@ static void handler(int sig) {
 int main() {
 	int buf;
 	signal(SIGPIPE, handler);
-	signal(SIGQUIT, handler);
+	signal(SIGINT, handler);
 	while (1) {
 		from_client = server_handshake( &to_client );
 		printf("shooketh\n");
